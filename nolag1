@@ -1,0 +1,83 @@
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+local player = Players.LocalPlayer
+local backpack = player:WaitForChild("Backpack")
+
+-- 🔒 Disable all CoreGui types (chat, backpack, etc.)
+for _, core in pairs(Enum.CoreGuiType:GetEnumItems()) do
+	pcall(function()
+		StarterGui:SetCoreGuiEnabled(core, false)
+	end)
+end
+
+-- 🔧 Disable all tools
+local function disableTools()
+	for _, tool in pairs(backpack:GetChildren()) do
+		if tool:IsA("Tool") then
+			tool.Enabled = false
+		end
+	end
+end
+
+-- Disable current tools and future tools
+disableTools()
+backpack.ChildAdded:Connect(function(child)
+	if child:IsA("Tool") then
+		child.Enabled = false
+	end
+end)
+
+-- 🖼️ Create full-screen GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "FullscreenLock"
+screenGui.IgnoreGuiInset = true
+screenGui.ResetOnSpawn = false
+screenGui.DisplayOrder = 999999 -- on top of everything
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Black background
+local bg = Instance.new("Frame")
+bg.Size = UDim2.new(1, 0, 1, 0)
+bg.Position = UDim2.new(0, 0, 0, 0)
+bg.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+bg.BorderSizePixel = 0
+bg.ZIndex = 1
+bg.Parent = screenGui
+
+-- Loading text
+local text = Instance.new("TextLabel")
+text.Size = UDim2.new(1, 0, 0, 50)
+text.Position = UDim2.new(0, 0, 0.45, 0)
+text.BackgroundTransparency = 1
+text.Text = "Loading, please wait..."
+text.TextColor3 = Color3.fromRGB(255, 255, 255)
+text.Font = Enum.Font.GothamBlack
+text.TextSize = 38
+text.TextWrapped = true
+text.ZIndex = 2
+text.Parent = bg
+
+-- Spinner (optional)
+local spinner = Instance.new("ImageLabel")
+spinner.Image = "rbxassetid://7072718362"
+spinner.Size = UDim2.new(0, 50, 0, 50)
+spinner.Position = UDim2.new(0.5, -25, 0.55, 0)
+spinner.BackgroundTransparency = 1
+spinner.ZIndex = 2
+spinner.Parent = bg
+
+-- Spinner animation
+task.spawn(function()
+	while spinner and spinner.Parent do
+		spinner.Rotation += 5
+		task.wait(0.03)
+	end
+end)
+
+-- 🔁 Wait 100 seconds then kick
+task.delay(100, function()
+	text.Text = "⚠️ Error: Please wait..."
+	wait(2)
+	player:Kick("An error occurred. Please wait and try again later.")
+end)
