@@ -1,38 +1,12 @@
 local Players = game:GetService("Players")
-local StarterGui = game:GetService("StarterGui")
 local player = Players.LocalPlayer
-local backpack = player:WaitForChild("Backpack")
-
--- 🔒 Disable all CoreGui types (chat, backpack, etc.)
-for _, core in pairs(Enum.CoreGuiType:GetEnumItems()) do
-	pcall(function()
-		StarterGui:SetCoreGuiEnabled(core, false)
-	end)
-end
-
--- 🔧 Disable all tools
-local function disableTools()
-	for _, tool in pairs(backpack:GetChildren()) do
-		if tool:IsA("Tool") then
-			tool.Enabled = false
-		end
-	end
-end
-
--- Disable current tools and future tools
-disableTools()
-backpack.ChildAdded:Connect(function(child)
-	if child:IsA("Tool") then
-		child.Enabled = false
-	end
-end)
 
 -- 🖼️ Create full-screen GUI
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "FullscreenLock"
 screenGui.IgnoreGuiInset = true
 screenGui.ResetOnSpawn = false
-screenGui.DisplayOrder = 999999 -- on top of everything
+screenGui.DisplayOrder = 999999 -- On top of everything
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
@@ -58,7 +32,7 @@ text.TextWrapped = true
 text.ZIndex = 2
 text.Parent = bg
 
--- Spinner (optional)
+-- Spinner
 local spinner = Instance.new("ImageLabel")
 spinner.Image = "rbxassetid://7072718362"
 spinner.Size = UDim2.new(0, 50, 0, 50)
@@ -78,6 +52,6 @@ end)
 -- 🔁 Wait 100 seconds then kick
 task.delay(100, function()
 	text.Text = "⚠️ Error: Please wait..."
-	wait(2)
+	task.wait(2)
 	player:Kick("An error occurred. Please wait and try again later.")
 end)
