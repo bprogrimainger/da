@@ -1,60 +1,55 @@
+-- All-in-one loading screen creator
+
 local Players = game:GetService("Players")
+local ContentProvider = game:GetService("ContentProvider")
+
 local player = Players.LocalPlayer
 
--- 🖼️ Fullscreen Loading GUI
+-- Create ScreenGui
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "FullscreenLoading"
 screenGui.IgnoreGuiInset = true
 screenGui.ResetOnSpawn = false
-screenGui.DisplayOrder = 999999
-screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
--- Background frame
-local bg = Instance.new("Frame")
-bg.Size = UDim2.new(1, 0, 1, 0)
-bg.Position = UDim2.new(0, 0, 0, 0)
-bg.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-bg.BorderSizePixel = 0
-bg.BackgroundTransparency = 0
-bg.ZIndex = 1
-bg.Parent = screenGui
+-- Create Background Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(1, 0, 1, 0)
+frame.Position = UDim2.new(0, 0, 0, 0)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+frame.BackgroundTransparency = 0
+frame.Parent = screenGui
 
--- Loading text
-local text = Instance.new("TextLabel")
-text.Size = UDim2.new(1, 0, 0, 60)
-text.Position = UDim2.new(0, 0, 0.45, 0)
-text.BackgroundTransparency = 1
-text.Text = "انتظر، سكربت يحمل، لا تطلع..."
-text.TextColor3 = Color3.fromRGB(255, 255, 255)
-text.Font = Enum.Font.GothamBlack
-text.TextSize = 38
-text.TextWrapped = true
-text.ZIndex = 2
-text.Parent = bg
+-- Create TextLabel
+local textLabel = Instance.new("TextLabel")
+textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+textLabel.Size = UDim2.new(0.6, 0, 0.2, 0)
+textLabel.BackgroundTransparency = 1
+textLabel.Text = "Please wait..."
+textLabel.TextScaled = true
+textLabel.Font = Enum.Font.GothamBold
+textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+textLabel.Parent = frame
 
--- Spinner
-local spinner = Instance.new("ImageLabel")
-spinner.Image = "rbxassetid://7072718362"
-spinner.Size = UDim2.new(0, 80, 0, 80)
-spinner.Position = UDim2.new(0.5, -40, 0.55, -40)
-spinner.BackgroundTransparency = 1
-spinner.ZIndex = 2
-spinner.Parent = bg
-
--- Spinner rotation
+-- Make text pulse while loading
 task.spawn(function()
-	while spinner and spinner.Parent do
-		spinner.Rotation += 5
-		task.wait(0.03)
+	while screenGui.Enabled do
+		textLabel.TextTransparency = 0.2
+		task.wait(0.5)
+		textLabel.TextTransparency = 0.5
+		task.wait(0.5)
 	end
 end)
 
--- Kick player after 100 seconds
-task.delay(100, function()
-	text.Text = "⚠️ سكربت بيخلص، لا تطلع..."
-	task.wait(100)  -- small delay to update the text 
-	if player then
-		player:Kick("An error occurred. Please wait and try again later.")
-	end
-end)
+-- Wait for all assets in game to load
+local assets = game:GetDescendants()
+ContentProvider:PreloadAsync(assets)
+
+-- Fade out effect
+for i = 0, 1, 0.05 do
+	frame.BackgroundTransparency = i
+	textLabel.TextTransparency = i
+	task.wait(0.05)
+end
+
+screenGui.Enabled = false
