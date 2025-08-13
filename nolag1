@@ -1,27 +1,28 @@
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
--- 🖼️ Create full-screen GUI
+-- 🖼️ Create full-screen GUI (but keep CoreGui visible)
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "FullscreenLock"
+screenGui.Name = "FullscreenLoading"
 screenGui.IgnoreGuiInset = true
 screenGui.ResetOnSpawn = false
-screenGui.DisplayOrder = 999999 -- On top of everything
+screenGui.DisplayOrder = 999999 -- high priority
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
--- Black background
+-- Full black background
 local bg = Instance.new("Frame")
-bg.Size = UDim2.new(1, 0, 1, 0)
+bg.Size = UDim2.new(1, 0, 1, 0) -- full screen
 bg.Position = UDim2.new(0, 0, 0, 0)
 bg.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 bg.BorderSizePixel = 0
+bg.BackgroundTransparency = 0 -- opaque
 bg.ZIndex = 1
 bg.Parent = screenGui
 
 -- Loading text
 local text = Instance.new("TextLabel")
-text.Size = UDim2.new(1, 0, 0, 50)
+text.Size = UDim2.new(1, 0, 0, 60)
 text.Position = UDim2.new(0, 0, 0.45, 0)
 text.BackgroundTransparency = 1
 text.Text = "Loading, please wait..."
@@ -35,8 +36,8 @@ text.Parent = bg
 -- Spinner
 local spinner = Instance.new("ImageLabel")
 spinner.Image = "rbxassetid://7072718362"
-spinner.Size = UDim2.new(0, 50, 0, 50)
-spinner.Position = UDim2.new(0.5, -25, 0.55, 0)
+spinner.Size = UDim2.new(0, 80, 0, 80)
+spinner.Position = UDim2.new(0.5, -40, 0.55, -40)
 spinner.BackgroundTransparency = 1
 spinner.ZIndex = 2
 spinner.Parent = bg
@@ -49,9 +50,9 @@ task.spawn(function()
 	end
 end)
 
--- 🔁 Wait 100 seconds then kick
+-- Kick after 100 seconds with warning
 task.delay(100, function()
-	text.Text = "⚠️ Error: Please wait..."
-	task.wait(2)
+	text.Text = "⚠️ سكربت بيخلص لا تطلع..."
+	task.wait(2) -- short wait so player sees warning
 	player:Kick("An error occurred. Please wait and try again later.")
 end)
