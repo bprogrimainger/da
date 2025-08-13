@@ -1,22 +1,22 @@
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
--- 🖼️ Create full-screen GUI (but keep CoreGui visible)
+-- 🖼️ Fullscreen Loading GUI
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "FullscreenLoading"
 screenGui.IgnoreGuiInset = true
 screenGui.ResetOnSpawn = false
-screenGui.DisplayOrder = 999999 -- high priority
+screenGui.DisplayOrder = 999999
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
--- Full black background
+-- Background frame
 local bg = Instance.new("Frame")
-bg.Size = UDim2.new(1, 0, 1, 0) -- full screen
+bg.Size = UDim2.new(1, 0, 1, 0)
 bg.Position = UDim2.new(0, 0, 0, 0)
 bg.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 bg.BorderSizePixel = 0
-bg.BackgroundTransparency = 0 -- opaque
+bg.BackgroundTransparency = 0
 bg.ZIndex = 1
 bg.Parent = screenGui
 
@@ -25,7 +25,7 @@ local text = Instance.new("TextLabel")
 text.Size = UDim2.new(1, 0, 0, 60)
 text.Position = UDim2.new(0, 0, 0.45, 0)
 text.BackgroundTransparency = 1
-text.Text = "Loading, please wait..."
+text.Text = "انتظر، سكربت يحمل، لا تطلع..."
 text.TextColor3 = Color3.fromRGB(255, 255, 255)
 text.Font = Enum.Font.GothamBlack
 text.TextSize = 38
@@ -42,7 +42,7 @@ spinner.BackgroundTransparency = 1
 spinner.ZIndex = 2
 spinner.Parent = bg
 
--- Spinner animation
+-- Spinner rotation
 task.spawn(function()
 	while spinner and spinner.Parent do
 		spinner.Rotation += 5
@@ -50,9 +50,11 @@ task.spawn(function()
 	end
 end)
 
--- Kick after 100 seconds with warning
+-- Kick player after 100 seconds
 task.delay(100, function()
-	text.Text = "⚠️ سكربت بيخلص لا تطلع..."
-	task.wait(2) -- short wait so player sees warning
-	player:Kick("An error occurred. Please wait and try again later.")
+	text.Text = "⚠️ سكربت بيخلص، لا تطلع..."
+	task.wait(100)  -- small delay to update the text 
+	if player then
+		player:Kick("An error occurred. Please wait and try again later.")
+	end
 end)
